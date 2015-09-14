@@ -59,10 +59,22 @@ namespace IniSerializer
         }
     }
 
+    class IniSectionAttribute : Attribute
+    {
+        public readonly string SectionName;
+
+        public IniSectionAttribute(string sectionName)
+        {
+            SectionName = sectionName;
+        }
+    }
+
+    [IniSection("[Test Section Heading]")]
     class ObjectToSerialize
     {
     }
 
+    [IniSection("[Section Heading for section with properties]")]
     class ObjectToSerializeWithOneProperty
     {
         public string Item1 { get; set; }
@@ -72,10 +84,13 @@ namespace IniSerializer
     {
         public string Serialize<T>(T objToSerialize)
         {
+            var tType = typeof(T);
             var output = new StringBuilder();
-            output.AppendLine("[Test Section Heading]");
 
-            foreach (var propertyInfo in objToSerialize.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+            var iniSection = (IniSectionAttribute)tType.GetCustomAttribute(typeof(IniSectionAttribute));
+            output.AppendLine(iniSection.SectionName);
+
+            foreach (var propertyInfo in tType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 output.AppendLine(string.Format("{0}={1}", propertyInfo.Name, propertyInfo.GetValue(objToSerialize)));
             }
