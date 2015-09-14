@@ -45,10 +45,6 @@ namespace IniSerializer
         }
     }
 
-    public class MustImplementIniSectionAttributeException
-    {
-    }
-
     public class Given_I_want_to_serialize_an_object_with_one_property
     {
         class When_the_object_is_serialized
@@ -76,6 +72,15 @@ namespace IniSerializer
         }
     }
 
+    public class MustImplementIniSectionAttributeException : Exception
+    {
+        public MustImplementIniSectionAttributeException()
+            : base("The object to serialize must be decorated with the 'IniSectionAttribute' class attribute")
+        {
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
     class IniSectionAttribute : Attribute
     {
         public readonly string SectionName;
@@ -83,6 +88,7 @@ namespace IniSerializer
         public IniSectionAttribute(string sectionName)
         {
             SectionName = sectionName;
+
         }
     }
 
@@ -116,7 +122,10 @@ namespace IniSerializer
             var tType = typeof(T);
             var output = new StringBuilder();
 
-            var iniSection = (IniSectionAttribute)tType.GetCustomAttribute(typeof(IniSectionAttribute));
+            var iniSection = tType.GetCustomAttribute(typeof(IniSectionAttribute)) as IniSectionAttribute;
+            if (iniSection == null)
+                throw new MustImplementIniSectionAttributeException();
+
             output.AppendLine(iniSection.SectionName);
 
             foreach (var propertyInfo in tType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
