@@ -54,7 +54,7 @@ namespace IniSerializer
             [Test]
             public void And_the_property_is_added_to_the_second_line_as_a_key_value_pair_seperated_by_and_equals_sign()
             {
-                Assert.AreEqual("Item1=Value Of Item 1", _serializedOutput[1]);
+                Assert.AreEqual("TheItem=Value Of Item 1", _serializedOutput[1]);
             }
         }
     }
