@@ -43,7 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IniSectionAttribute.cs" />
     <Compile Include="IniSerializer.cs" />
     <Compile Include="IniValueAttribute.cs" />
     <Compile Include="MustImplementIniSectionAttributeException.cs" />
