@@ -190,10 +190,12 @@ namespace IniSerializer
 
             foreach (var propertyInfo in tType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                output.AppendLine(
-                    string.Format("{0}={1}",
-                        ((IniValueAttribute) propertyInfo.GetCustomAttribute(typeof (IniValueAttribute))).Key,
-                        propertyInfo.GetValue(objToSerialize)));
+                var iniValueAttribute = propertyInfo.GetCustomAttribute(typeof (IniValueAttribute)) as IniValueAttribute;
+                if (iniValueAttribute != null)
+                    output.AppendLine(
+                        string.Format("{0}={1}",
+                            iniValueAttribute.Key,
+                            propertyInfo.GetValue(objToSerialize)));
             }
             return output.ToString();
         }
