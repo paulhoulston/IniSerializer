@@ -7,6 +7,19 @@ namespace IniSerializer
 {
     public class Given_I_want_to_serialize_an_object_with_no_values
     {
+        class When_the_serialized_object_does_not_implement_the_IniSectionAttribute_attribute
+        {
+            private class ObjectToSerialize
+            {
+            }
+
+            [Test, ExpectedException(typeof(MustImplementIniSectionAttributeException))]
+            public void Then_an_MustImplementIniSectionAttributeException_exception_is_thrown()
+            {
+                new IniSerializer().Serialize(new ObjectToSerialize());
+            }
+        }
+
         class When_the_object_is_serialized
         {
             private readonly string[] _serializedOutput;
@@ -30,6 +43,10 @@ namespace IniSerializer
                 Assert.AreEqual(1, _serializedOutput.Length);
             }
         }
+    }
+
+    public class MustImplementIniSectionAttributeException
+    {
     }
 
     public class Given_I_want_to_serialize_an_object_with_one_property
