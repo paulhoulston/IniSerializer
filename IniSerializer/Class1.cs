@@ -69,6 +69,17 @@ namespace IniSerializer
         }
     }
 
+    class IniValueAttribute : Attribute
+    {
+        public readonly string Key;
+
+        public IniValueAttribute(string key)
+        {
+            Key = key;
+        }
+    }
+
+
     [IniSection("[Test Section Heading]")]
     class ObjectToSerialize
     {
@@ -77,6 +88,7 @@ namespace IniSerializer
     [IniSection("[Section Heading for section with properties]")]
     class ObjectToSerializeWithOneProperty
     {
+        [IniValue("TheItem")]
         public string Item1 { get; set; }
     }
 
@@ -92,7 +104,9 @@ namespace IniSerializer
 
             foreach (var propertyInfo in tType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                output.AppendLine(string.Format("{0}={1}", propertyInfo.Name, propertyInfo.GetValue(objToSerialize)));
+                output.AppendLine(string.Format("{0}={1}",
+                    ((IniValueAttribute)propertyInfo.GetCustomAttribute(typeof(IniValueAttribute))).Key,
+                    propertyInfo.GetValue(objToSerialize)));
             }
             return output.ToString();
         }
