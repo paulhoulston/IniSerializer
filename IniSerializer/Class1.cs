@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Text;
+using NUnit.Framework;
 
 namespace IniSerializer
 {
@@ -26,7 +28,7 @@ namespace IniSerializer
             {
                 var objToSerialize = new ObjectToSerializeWithOneProperty { Item1 = "Value Of Item 1" };
                 var serializer = new IniSerializer();
-                _serializedOutput = serializer.Serialize(objToSerialize).Split('\r', '\n');
+                _serializedOutput = serializer.Serialize(objToSerialize).Split(new []{'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             }
 
             [Test]
@@ -56,7 +58,10 @@ namespace IniSerializer
     {
         public string Serialize<T>(T objToSerialize)
         {
-            return "[Test Section Heading]";
+            var output = new StringBuilder();
+            output.AppendLine("[Test Section Heading]");
+            output.AppendLine("Item1=Value Of Item 1");
+            return output.ToString();
         }
     }
 
