@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="IniSerializer.cs" />
     <Compile Include="IniValueAttribute.cs" />
-    <Compile Include="MustImplementIniSectionAttributeException.cs" />
     <Compile Include="SerializationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

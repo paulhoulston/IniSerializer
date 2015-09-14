@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
 
 namespace IniSerializer
 {
     public class Given_I_want_to_serialize_an_object_with_no_properties
     {
-        private class When_the_serialized_object_does_not_implement_the_IniSectionAttribute_attribute
+        private class When_the_serialized_object_does_not_implement_the_IHaveASectionName_interface
         {
             private class ObjectToSerialize
             {
             }
 
-            [Test, ExpectedException(typeof (MustImplementIniSectionAttributeException))]
-            public void Then_an_MustImplementIniSectionAttributeException_exception_is_thrown()
+            [Test]
+            public void Then_the_name_of_the_class_is_used_as_the_section_heading()
             {
-                new IniSerializer<ObjectToSerialize>().Serialize(new ObjectToSerialize());
+                var serializedOutput =
+                    new IniSerializer<ObjectToSerialize>()
+                        .Serialize(
+                            new ObjectToSerialize());
+
+                Assert.AreEqual("[ObjectToSerialize]", serializedOutput);
             }
         }
 
@@ -80,7 +84,7 @@ namespace IniSerializer
                 _serializedOutput =
                     new IniSerializer<ObjectToSerialize>()
                         .Serialize(
-                            new ObjectToSerialize(("Section Heading for section with one property"))
+                            new ObjectToSerialize("Section Heading for section with one property")
                             {
                                 Item1 = "Value Of Item 1"
                             })
