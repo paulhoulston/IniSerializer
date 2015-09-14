@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -17,7 +18,7 @@ namespace IniSerializer
             [Test, ExpectedException(typeof (MustImplementIniSectionAttributeException))]
             public void Then_an_MustImplementIniSectionAttributeException_exception_is_thrown()
             {
-                new IniSerializer().Serialize(new ObjectToSerialize());
+                new IniSerializer<ObjectToSerialize>().Serialize(new ObjectToSerialize());
             }
         }
 
@@ -33,7 +34,7 @@ namespace IniSerializer
             public When_the_object_is_serialized()
             {
                 _serializedOutput
-                    = new IniSerializer()
+                    = new IniSerializer<ObjectToSerialize>()
                         .Serialize(new ObjectToSerialize())
                         .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             }
@@ -56,7 +57,7 @@ namespace IniSerializer
     {
         private class When_the_object_is_serialized
         {
-            [IniSection("[Section Heading for section with properties]")]
+            [IniSection("[Section Heading for section with one property]")]
             private class ObjectToSerializeWithOneProperty
             {
                 [IniValue("TheItem")]
@@ -68,18 +69,19 @@ namespace IniSerializer
             public When_the_object_is_serialized()
             {
                 _serializedOutput =
-                    new IniSerializer()
-                        .Serialize(new ObjectToSerializeWithOneProperty
-                        {
-                            Item1 = "Value Of Item 1"
-                        })
+                    new IniSerializer<ObjectToSerializeWithOneProperty>()
+                        .Serialize(
+                            new ObjectToSerializeWithOneProperty
+                            {
+                                Item1 = "Value Of Item 1"
+                            })
                         .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             }
 
             [Test]
             public void Then_the_section_name_is_output_on_the_first_line()
             {
-                Assert.AreEqual("[Section Heading for section with properties]", _serializedOutput[0]);
+                Assert.AreEqual("[Section Heading for section with one property]", _serializedOutput[0]);
             }
 
             [Test]
@@ -94,7 +96,7 @@ namespace IniSerializer
     {
         private class When_the_object_is_serialized
         {
-            [IniSection("[Section Heading for section with properties]")]
+            [IniSection("[Section Heading for section with multiple properties]")]
             private class ObjectToSerializeWithOneProperty
             {
                 [IniValue("AStringValue")]
@@ -111,20 +113,21 @@ namespace IniSerializer
             public When_the_object_is_serialized()
             {
                 _serializedOutput =
-                    new IniSerializer()
-                        .Serialize(new ObjectToSerializeWithOneProperty
-                        {
-                            StringValue = "Value Of Item 1",
-                            IntegerValue = 3,
-                            PropertyToIgnore = "StringValueWithNoAttribute"
-                        })
+                    new IniSerializer<ObjectToSerializeWithOneProperty>()
+                        .Serialize(
+                            new ObjectToSerializeWithOneProperty
+                            {
+                                StringValue = "Value Of Item 1",
+                                IntegerValue = 3,
+                                PropertyToIgnore = "StringValueWithNoAttribute"
+                            })
                         .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             }
 
             [Test]
             public void Then_the_section_name_is_output_on_the_first_line()
             {
-                Assert.AreEqual("[Section Heading for section with properties]", _serializedOutput[0]);
+                Assert.AreEqual("[Section Heading for section with multiple properties]", _serializedOutput[0]);
             }
 
             [Test]
@@ -175,29 +178,42 @@ namespace IniSerializer
         }
     }
 
-    internal class IniSerializer
+    class IniSerializer<T>
     {
-        public string Serialize<T>(T objToSerialize)
-        {
-            var tType = typeof (T);
-            var output = new StringBuilder();
+        private readonly Type _tType;
 
-            var iniSection = tType.GetCustomAttribute(typeof (IniSectionAttribute)) as IniSectionAttribute;
+        public IniSerializer()
+        {
+            _tType = typeof (T);
+        }
+
+        public string Serialize(T objToSerialize)
+        {
+            var iniFileLines = new List<string>
+            {
+                getSectionName()
+            };
+            iniFileLines.AddRange(getSectionValues(objToSerialize));
+
+            return string.Join(Environment.NewLine, iniFileLines);
+        }
+
+        private string getSectionName()
+        {
+            var iniSection = _tType.GetCustomAttribute(typeof(IniSectionAttribute)) as IniSectionAttribute;
             if (iniSection == null)
                 throw new MustImplementIniSectionAttributeException();
+            return iniSection.SectionName;
+        }
 
-            output.AppendLine(iniSection.SectionName);
-
-            foreach (var propertyInfo in tType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
-            {
-                var iniValueAttribute = propertyInfo.GetCustomAttribute(typeof (IniValueAttribute)) as IniValueAttribute;
-                if (iniValueAttribute != null)
-                    output.AppendLine(
-                        string.Format("{0}={1}",
-                            iniValueAttribute.Key,
-                            propertyInfo.GetValue(objToSerialize)));
-            }
-            return output.ToString();
+        private IEnumerable<string> getSectionValues(T objToSerialize)
+        {
+            return from pi in _tType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                let iniValue = pi.GetCustomAttribute(typeof (IniValueAttribute)) as IniValueAttribute
+                where iniValue != null
+                select string.Format("{0}={1}",
+                    iniValue.Key,
+                    pi.GetValue(objToSerialize));
         }
     }
 
