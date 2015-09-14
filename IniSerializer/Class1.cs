@@ -74,7 +74,11 @@ namespace IniSerializer
         {
             var output = new StringBuilder();
             output.AppendLine("[Test Section Heading]");
-            output.AppendLine("Item1=Value Of Item 1");
+
+            foreach (var propertyInfo in objToSerialize.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
+            {
+                output.AppendLine(string.Format("{0}={1}", propertyInfo.Name, propertyInfo.GetValue(objToSerialize)));
+            }
             return output.ToString();
         }
     }
