@@ -48,7 +48,7 @@ namespace IniSerializer
             [Test]
             public void Then_the_section_name_is_output_on_the_first_line()
             {
-                Assert.AreEqual("[Test Section Heading]", _serializedOutput[0]);
+                Assert.AreEqual("[Section Heading for section with properties]", _serializedOutput[0]);
             }
 
             [Test]
