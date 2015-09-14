@@ -195,8 +195,13 @@ namespace IniSerializer
     public class Given_I_want_to_serialize_an_enumerable_of_objects
     {
         [IniSectionAttribute("[Section]")]
-        private class ObjectToSerialize
+        private class ObjectToSerialize : IHaveASectionName
         {
+            public ObjectToSerialize(string sectionName)
+            {
+                SectionName = sectionName;
+            }
+
             [IniValue("Item1", Position = 1)]
             public string Item1 { get; set; }
 
@@ -206,6 +211,7 @@ namespace IniSerializer
             [IniValue("Item3", Position = 3)]
             public string Item3 { get; set; }
 
+            public string SectionName { get; private set; }
         }
 
         public class When_there_is_one_item
@@ -223,7 +229,7 @@ namespace IniSerializer
                     new IniSerializer<ObjectToSerialize>().Serialize(
                     new[]
                     {
-                        new ObjectToSerialize
+                        new ObjectToSerialize("Section")
                         {
                             Item1 = "Value_1_1",
                             Item2 = "Value_1_2",
@@ -253,13 +259,13 @@ namespace IniSerializer
                     new IniSerializer<ObjectToSerialize>().Serialize(
                     new[]
                     {
-                        new ObjectToSerialize
+                        new ObjectToSerialize("Section_1")
                         {
                             Item1 = "Value_1_1",
                             Item2 = "Value_1_2",
                             Item3 = "Value_1_3",
                         },
-                        new ObjectToSerialize
+                        new ObjectToSerialize("Section_2")
                         {
                             Item1 = "Value_2_1",
                             Item2 = "Value_2_2",
