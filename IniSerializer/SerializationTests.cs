@@ -156,13 +156,13 @@ namespace IniSerializer
             [IniSection("[Section Heading for section with ordered properties]")]
             private class ObjectToSerialize
             {
-                [IniValue("Item1")]
+                [IniValue("Item1", Position = 3)]
                 public string Item1 { get; set; }
 
-                [IniValue("Item2")]
+                [IniValue("Item2", Position = 1)]
                 public string Item2 { get; set; }
 
-                [IniValue("Item3")]
+                [IniValue("Item3", Position = 2)]
                 public string Item3 { get; set; }
             }
 
@@ -187,9 +187,9 @@ namespace IniSerializer
             [Test]
             public void Then_the_objects_are_ordered_correctly()
             {
-                Assert.AreEqual("Item2", _serializedOutput[1]);
-                Assert.AreEqual("Item3", _serializedOutput[2]);
-                Assert.AreEqual("Item1", _serializedOutput[3]);
+                Assert.AreEqual("Item2=Position 1", _serializedOutput[1]);
+                Assert.AreEqual("Item3=Position 2", _serializedOutput[2]);
+                Assert.AreEqual("Item1=Position 3", _serializedOutput[3]);
             }
         }
     }
@@ -212,7 +212,7 @@ namespace IniSerializer
 
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
-    internal class IniSectionAttribute : Attribute
+    public class IniSectionAttribute : Attribute
     {
         public readonly string SectionName;
 
@@ -222,7 +222,7 @@ namespace IniSerializer
         }
     }
 
-    internal class IniValueAttribute : Attribute
+    public class IniValueAttribute : Attribute
     {
         public readonly string Key;
 
@@ -230,9 +230,11 @@ namespace IniSerializer
         {
             Key = key;
         }
+
+        public int Position { get; set; }
     }
 
-    class IniSerializer<T>
+    public class IniSerializer<T>
     {
         private readonly Type _tType;
 
@@ -265,6 +267,7 @@ namespace IniSerializer
             return from pi in _tType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 let iniValue = pi.GetCustomAttribute(typeof (IniValueAttribute)) as IniValueAttribute
                 where iniValue != null
+                orderby iniValue.Position
                 select string.Format("{0}={1}",
                     iniValue.Key,
                     pi.GetValue(objToSerialize));
