@@ -16,7 +16,7 @@ namespace IniSerializer
             public void Then_the_name_of_the_class_is_used_as_the_section_heading()
             {
                 var serializedOutput =
-                    new IniSerializer<ObjectToSerialize>()
+                    IniSerializer
                         .Serialize(
                             new ObjectToSerialize());
 
@@ -28,7 +28,7 @@ namespace IniSerializer
         {
             private readonly string[] _serializedOutput;
 
-            private class ObjectToSerialize : IHaveASectionName
+            private class ObjectToSerialize : IniSerializer.IHaveASectionName
             {
                 public ObjectToSerialize(string sectionName)
                 {
@@ -41,7 +41,7 @@ namespace IniSerializer
             public When_the_object_is_serialized()
             {
                 _serializedOutput
-                    = new IniSerializer<ObjectToSerialize>()
+                    = IniSerializer
                         .Serialize(new ObjectToSerialize("Test Section Heading"))
                         .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             }
@@ -64,7 +64,7 @@ namespace IniSerializer
     {
         private class When_the_object_is_serialized
         {
-            private class ObjectToSerialize : IHaveASectionName
+            private class ObjectToSerialize : IniSerializer.IHaveASectionName
             {
                 public ObjectToSerialize(string sectionName)
                 {
@@ -82,7 +82,7 @@ namespace IniSerializer
             public When_the_object_is_serialized()
             {
                 _serializedOutput =
-                    new IniSerializer<ObjectToSerialize>()
+                    IniSerializer
                         .Serialize(
                             new ObjectToSerialize("Section Heading for section with one property")
                             {
@@ -109,9 +109,9 @@ namespace IniSerializer
     {
         private class When_the_object_is_serialized
         {
-            private class ObjectToSerializeWithOneProperty : IHaveASectionName
+            private class ObjectToSerialize : IniSerializer.IHaveASectionName
             {
-                public ObjectToSerializeWithOneProperty(string sectionName)
+                public ObjectToSerialize(string sectionName)
                 {
                     SectionName = sectionName;
                 }
@@ -132,9 +132,9 @@ namespace IniSerializer
             public When_the_object_is_serialized()
             {
                 _serializedOutput =
-                    new IniSerializer<ObjectToSerializeWithOneProperty>()
+                    IniSerializer
                         .Serialize(
-                            new ObjectToSerializeWithOneProperty("Section Heading for section with multiple properties")
+                            new ObjectToSerialize("Section Heading for section with multiple properties")
                             {
                                 StringValue = "Value Of Item 1",
                                 IntegerValue = 3,
@@ -172,7 +172,7 @@ namespace IniSerializer
         {
             private readonly string[] _serializedOutput;
 
-            private class ObjectToSerialize : IHaveASectionName
+            private class ObjectToSerialize : IniSerializer.IHaveASectionName
             {
                 public ObjectToSerialize(string sectionName)
                 {
@@ -194,7 +194,7 @@ namespace IniSerializer
             public When_the_properties_on_the_object_to_be_serialized_have_the_order_set()
             {
                 _serializedOutput =
-                    new IniSerializer<ObjectToSerialize>().Serialize(
+                    IniSerializer.Serialize(
                         new ObjectToSerialize("Section Heading for section with ordered properties")
                         {
                             Item1 = "Position 3",
@@ -221,7 +221,7 @@ namespace IniSerializer
 
     public class Given_I_want_to_serialize_an_enumerable_of_objects
     {
-        private class ObjectToSerialize : IHaveASectionName
+        public class ObjectToSerialize : IniSerializer.IHaveASectionName
         {
             public ObjectToSerialize(string sectionName)
             {
@@ -252,7 +252,7 @@ namespace IniSerializer
                     "Item3=Value_1_3";
 
                 var serializedOutput =
-                    new IniSerializer<ObjectToSerialize>().Serialize(
+                    IniSerializer.Serialize(
                     new[]
                     {
                         new ObjectToSerialize("Section")
@@ -282,7 +282,7 @@ namespace IniSerializer
                     "Item3=Value_2_3";
 
                 var serializedOutput =
-                    new IniSerializer<ObjectToSerialize>().Serialize(
+                    IniSerializer.Serialize(
                     new[]
                     {
                         new ObjectToSerialize("Section_1")

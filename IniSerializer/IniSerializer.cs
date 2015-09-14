@@ -5,53 +5,43 @@ using System.Reflection;
 
 namespace IniSerializer
 {
-    public interface IHaveASectionName
+    public static class IniSerializer
     {
-        string SectionName { get; }
-    }
+        private const string SectionHeadingFormat = "[{0}]";
 
-    public class IniSerializer<T>
-    {
-        private readonly Type _tType;
-
-        public IniSerializer()
+        public interface IHaveASectionName
         {
-            _tType = typeof (T);
+            string SectionName { get; }
         }
 
-        public string Serialize(IEnumerable<T> objToSerialize)
+        public static string Serialize<T>(T objToSerialize)
         {
-            return string.Join(Environment.NewLine, objToSerialize.Select(Serialize));
-        }
-
-        public string Serialize(T objToSerialize)
-        {
-            var iniFileLines = new List<string>
+            // If the type is enumerable, iterate through the children
+            if (objToSerialize is IEnumerable<object>)
             {
-                getSectionName(objToSerialize)
-            };
+                return aggregateLines(((IEnumerable<object>)objToSerialize).Select(Serialize));
+            }
+            
+            var iniFileLines = new List<string>();
+            iniFileLines.Add(getSectionName(objToSerialize));
             iniFileLines.AddRange(getSectionValues(objToSerialize));
-
-            return string.Join(Environment.NewLine, iniFileLines);
+            return aggregateLines(iniFileLines);
+        }
+        
+        private static string aggregateLines(IEnumerable<string> lines)
+        {
+            return string.Join(Environment.NewLine, lines);
         }
 
-        private string getSectionName(T objToSerialize)
+        private static string getSectionName<T>(T objToSerialize)
         {
-            string sectionName;
-            if (objToSerialize is IHaveASectionName)
-            {
-                sectionName = ((IHaveASectionName) objToSerialize).SectionName;
-            }
-            else
-            {
-                sectionName = _tType.Name;
-            }
-            return string.Format("[{0}]", sectionName);
+            var name = objToSerialize as IHaveASectionName;
+            return string.Format(SectionHeadingFormat, name == null ? objToSerialize.GetType().Name : name.SectionName);
         }
 
-        private IEnumerable<string> getSectionValues(T objToSerialize)
+        private static IEnumerable<string> getSectionValues<T>(T objToSerialize)
         {
-            return from pi in _tType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            return from pi in objToSerialize.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 let iniValue = pi.GetCustomAttribute(typeof (IniValueAttribute)) as IniValueAttribute
                 where iniValue != null
                 orderby iniValue.Position
