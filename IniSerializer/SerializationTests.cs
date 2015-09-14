@@ -148,7 +148,60 @@ namespace IniSerializer
                 Assert.IsNull(_serializedOutput.SingleOrDefault(str => str.Contains("StringValueWithNoAttribute")));
             }
         }
+
+        private class When_the_properties_on_the_object_to_be_serialized_have_the_order_set
+        {
+            private readonly string[] _serializedOutput;
+
+            [IniSection("[Section Heading for section with ordered properties]")]
+            private class ObjectToSerialize
+            {
+                [IniValue("Item1")]
+                public string Item1 { get; set; }
+
+                [IniValue("Item2")]
+                public string Item2 { get; set; }
+
+                [IniValue("Item3")]
+                public string Item3 { get; set; }
+            }
+
+            public When_the_properties_on_the_object_to_be_serialized_have_the_order_set()
+            {
+                _serializedOutput =
+                    new IniSerializer<ObjectToSerialize>().Serialize(
+                        new ObjectToSerialize
+                        {
+                            Item1 = "Position 3",
+                            Item2 = "Position 1",
+                            Item3 = "Position 2",
+                        }).Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            [Test]
+            public void Then_the_section_name_is_output_on_the_first_line()
+            {
+                Assert.AreEqual("[Section Heading for section with ordered properties]", _serializedOutput[0]);
+            }
+
+            [Test]
+            public void Then_the_objects_are_ordered_correctly()
+            {
+                Assert.AreEqual("Item2", _serializedOutput[1]);
+                Assert.AreEqual("Item3", _serializedOutput[2]);
+                Assert.AreEqual("Item1", _serializedOutput[3]);
+            }
+        }
     }
+
+    //public class Given_I_want_to_serialize_a_list_of_objects
+    //{
+    //    public class When_there_are_multiple_objects
+    //    {
+    //        
+    //    }
+    //}
+    
     public class MustImplementIniSectionAttributeException : Exception
     {
         public MustImplementIniSectionAttributeException()
@@ -156,6 +209,7 @@ namespace IniSerializer
         {
         }
     }
+
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
     internal class IniSectionAttribute : Attribute
