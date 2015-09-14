@@ -194,3 +194,10 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+
+# NCrunch
+*.ncrunchproject
+*.ncrunchsolution
+
+# GhostDoc
+*.GhostDoc.xml
