@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using NUnit.Framework;
 
 namespace IniSerializer
 {
-    public class Given_I_want_to_serialize_an_object_with_no_values
+    public class Given_I_want_to_serialize_an_object_with_no_properties
     {
         private class When_the_serialized_object_does_not_implement_the_IniSectionAttribute_attribute
         {
@@ -31,9 +32,10 @@ namespace IniSerializer
 
             public When_the_object_is_serialized()
             {
-                var objToSerialize = new ObjectToSerialize();
-                var serializer = new IniSerializer();
-                _serializedOutput = serializer.Serialize(objToSerialize).Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+                _serializedOutput
+                    = new IniSerializer()
+                        .Serialize(new ObjectToSerialize())
+                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             }
 
             [Test]
@@ -65,9 +67,13 @@ namespace IniSerializer
 
             public When_the_object_is_serialized()
             {
-                var objToSerialize = new ObjectToSerializeWithOneProperty {Item1 = "Value Of Item 1"};
-                var serializer = new IniSerializer();
-                _serializedOutput = serializer.Serialize(objToSerialize).Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+                _serializedOutput =
+                    new IniSerializer()
+                        .Serialize(new ObjectToSerializeWithOneProperty
+                        {
+                            Item1 = "Value Of Item 1"
+                        })
+                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             }
 
             [Test]
@@ -84,6 +90,54 @@ namespace IniSerializer
         }
     }
 
+    public class Given_I_want_to_serialize_an_object_with_multiple_properties
+    {
+        private class When_the_object_is_serialized
+        {
+            [IniSection("[Section Heading for section with properties]")]
+            private class ObjectToSerializeWithOneProperty
+            {
+                [IniValue("AStringValue")]
+                public string StringValue { get; set; }
+
+                [IniValue("AnIntValue")]
+                public int IntegerValue { get; set; }
+            }
+
+            private readonly string[] _serializedOutput;
+
+            public When_the_object_is_serialized()
+            {
+                _serializedOutput =
+                    new IniSerializer()
+                        .Serialize(new ObjectToSerializeWithOneProperty
+                        {
+                            StringValue = "Value Of Item 1",
+                            IntegerValue = 3
+                        })
+                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            [Test]
+            public void Then_the_section_name_is_output_on_the_first_line()
+            {
+                Assert.AreEqual("[Section Heading for section with properties]", _serializedOutput[0]);
+            }
+
+            [Test]
+            public void And_the_string_value_property_is_added_to_as_a_key_value_pair_seperated_by_and_equals_sign()
+            {
+                Assert.NotNull(_serializedOutput.SingleOrDefault(str => str.Equals("AnIntValue=3")));
+            }
+
+            [Test]
+            public void And_the_int_value_property_is_added_to_as_a_key_value_pair_seperated_by_and_equals_sign()
+            {
+                Assert.NotNull(_serializedOutput.SingleOrDefault(str => str.Equals("AStringValue=Value Of Item 1")));
+            }
+
+        }
+    }
     public class MustImplementIniSectionAttributeException : Exception
     {
         public MustImplementIniSectionAttributeException()
