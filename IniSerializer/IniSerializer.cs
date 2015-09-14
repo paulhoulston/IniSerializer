@@ -46,7 +46,7 @@ namespace IniSerializer
                 where iniValue != null
                 orderby iniValue.Position
                 select string.Format("{0}={1}",
-                    iniValue.Key,
+                    string.IsNullOrEmpty(iniValue.Key) ? pi.Name : iniValue.Key,
                     pi.GetValue(objToSerialize, null));
         }
     }

@@ -134,7 +134,7 @@ namespace IniSerializer.Tests
             [Test]
             public void Then_the_name_of_the_class_is_used_as_the_section_heading()
             {
-                Assert.AreEqual("ObjectToSerialize", _serializedOutput[0]);
+                Assert.AreEqual("[ObjectToSerialize]", _serializedOutput[0]);
             }
 
             [Test]
