@@ -9,6 +9,7 @@ namespace IniSerializer
             [Test]
             public void Then_the_section_name_is_output_correctly()
             {
+                string serializedObject = "[Test Section Heading]";
                 Assert.AreEqual("[Test Section Heading]", serializedObject);
             }
         }
