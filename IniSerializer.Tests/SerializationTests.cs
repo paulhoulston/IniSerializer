@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using NUnit.Framework;
 
 namespace IniSerializer.Tests
@@ -72,7 +71,7 @@ namespace IniSerializer.Tests
                     SectionName = sectionName;
                 }
 
-                [IniValue("TheItem")]
+                [IniValue(Key = "TheItem")]
                 public string Item1 { get; set; }
 
                 public string SectionName { get; private set; }
@@ -156,10 +155,10 @@ namespace IniSerializer.Tests
                     SectionName = sectionName;
                 }
 
-                [IniValue("AStringValue")]
+                [IniValue(Key = "AStringValue")]
                 public string StringValue { get; set; }
 
-                [IniValue("AnIntValue")]
+                [IniValue(Key = "AnIntValue")]
                 public int IntegerValue { get; set; }
 
                 public string PropertyToIgnore { get; set; }
@@ -219,13 +218,13 @@ namespace IniSerializer.Tests
                     SectionName = sectionName;
                 }
 
-                [IniValue("Item1", Position = 3)]
+                [IniValue(Position = 3)]
                 public string Item1 { get; set; }
 
-                [IniValue("Item2", Position = 1)]
+                [IniValue(Position = 1)]
                 public string Item2 { get; set; }
 
-                [IniValue("Item3", Position = 2)]
+                [IniValue(Position = 2)]
                 public string Item3 { get; set; }
 
                 public string SectionName { get; private set; }
@@ -268,13 +267,13 @@ namespace IniSerializer.Tests
                 SectionName = sectionName;
             }
 
-            [IniValue("Item1", Position = 1)]
+            [IniValue(Position = 1)]
             public string Item1 { get; set; }
 
-            [IniValue("Item2", Position = 2)]
+            [IniValue(Position = 2)]
             public string Item2 { get; set; }
 
-            [IniValue("Item3", Position = 3)]
+            [IniValue(Position = 3)]
             public string Item3 { get; set; }
 
             public string SectionName { get; private set; }
