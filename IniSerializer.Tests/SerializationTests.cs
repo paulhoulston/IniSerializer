@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 
-namespace IniSerializer
+namespace IniSerializer.Tests
 {
     public class Given_I_want_to_serialize_an_object_with_no_properties
     {
@@ -43,7 +43,7 @@ namespace IniSerializer
                 _serializedOutput
                     = IniSerializer
                         .Serialize(new ObjectToSerialize("Test Section Heading"))
-                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+                        .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             }
 
             [Test]
@@ -88,7 +88,7 @@ namespace IniSerializer
                             {
                                 Item1 = "Value Of Item 1"
                             })
-                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+                        .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             }
 
             [Test]
@@ -140,7 +140,7 @@ namespace IniSerializer
                                 IntegerValue = 3,
                                 PropertyToIgnore = "StringValueWithNoAttribute"
                             })
-                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+                        .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             }
 
             [Test]
@@ -200,7 +200,7 @@ namespace IniSerializer
                             Item1 = "Position 3",
                             Item2 = "Position 1",
                             Item3 = "Position 2",
-                        }).Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+                        }).Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             }
 
             [Test]
