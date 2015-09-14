@@ -7,6 +7,10 @@ namespace IniSerializer
     {
         public readonly string Key;
 
+        public IniValueAttribute()
+        {
+        }
+
         public IniValueAttribute(string key)
         {
             Key = key;

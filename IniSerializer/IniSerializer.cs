@@ -42,12 +42,12 @@ namespace IniSerializer
         private static IEnumerable<string> getSectionValues<T>(T objToSerialize)
         {
             return from pi in objToSerialize.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                let iniValue = pi.GetCustomAttribute(typeof (IniValueAttribute)) as IniValueAttribute
+                let iniValue = pi.GetCustomAttributes(typeof (IniValueAttribute), false).FirstOrDefault() as IniValueAttribute
                 where iniValue != null
                 orderby iniValue.Position
                 select string.Format("{0}={1}",
                     iniValue.Key,
-                    pi.GetValue(objToSerialize));
+                    pi.GetValue(objToSerialize, null));
         }
     }
 }

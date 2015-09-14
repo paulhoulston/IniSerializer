@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using NUnit.Framework;
 
 namespace IniSerializer.Tests
@@ -88,7 +89,7 @@ namespace IniSerializer.Tests
                             {
                                 Item1 = "Value Of Item 1"
                             })
-                        .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             }
 
             [Test]
@@ -101,6 +102,45 @@ namespace IniSerializer.Tests
             public void And_the_property_is_added_to_the_second_line_as_a_key_value_pair_seperated_by_and_equals_sign()
             {
                 Assert.AreEqual("TheItem=Value Of Item 1", _serializedOutput[1]);
+            }
+        }
+    }
+
+    public class Given_I_want_to_serialize_an_object_with_the_keys_no_set_in_the_IniValue_attribute
+    {
+        private class When_the_object_is_serialized
+        {
+            private readonly string[] _serializedOutput;
+
+            private class ObjectToSerialize
+            {
+                [IniValue]
+                public string MyPropertyName { get; set; }
+            }
+
+            public When_the_object_is_serialized()
+            {
+                _serializedOutput =
+                    IniSerializer
+                        .Serialize(
+                            new ObjectToSerialize
+                            {
+                                MyPropertyName = "MyPropertyValue"
+                            })
+                        .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+
+            [Test]
+            public void Then_the_name_of_the_class_is_used_as_the_section_heading()
+            {
+                Assert.AreEqual("ObjectToSerialize", _serializedOutput[0]);
+            }
+
+            [Test]
+            public void And_the_property_key_is_set_to_the_property_name()
+            {
+                Assert.AreEqual("MyPropertyName=MyPropertyValue", _serializedOutput[1]);
             }
         }
     }
