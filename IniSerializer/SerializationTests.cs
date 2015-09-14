@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using NUnit.Framework;
 
@@ -272,83 +270,4 @@ namespace IniSerializer
             }
         }
     }
-
-    public class MustImplementIniSectionAttributeException : Exception
-    {
-        public MustImplementIniSectionAttributeException()
-            : base("The object to serialize must be decorated with the 'IniSectionAttribute' class attribute")
-        {
-        }
-    }
-
-
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
-    public class IniSectionAttribute : Attribute
-    {
-        public readonly string SectionName;
-
-        public IniSectionAttribute(string sectionName)
-        {
-            SectionName = sectionName;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class IniValueAttribute : Attribute
-    {
-        public readonly string Key;
-
-        public IniValueAttribute(string key)
-        {
-            Key = key;
-        }
-
-        public int Position { get; set; }
-    }
-
-    public class IniSerializer<T>
-    {
-        private readonly Type _tType;
-
-        public IniSerializer()
-        {
-            _tType = typeof (T);
-        }
-
-        public string Serialize(IEnumerable<T> objToSerialize)
-        {
-            return string.Join(Environment.NewLine, objToSerialize.Select(Serialize));
-        }
-
-        public string Serialize(T objToSerialize)
-        {
-            var iniFileLines = new List<string>
-            {
-                getSectionName()
-            };
-            iniFileLines.AddRange(getSectionValues(objToSerialize));
-
-            return string.Join(Environment.NewLine, iniFileLines);
-        }
-
-        private string getSectionName()
-        {
-            var iniSection = _tType.GetCustomAttribute(typeof(IniSectionAttribute)) as IniSectionAttribute;
-            if (iniSection == null)
-                throw new MustImplementIniSectionAttributeException();
-            return iniSection.SectionName;
-        }
-
-        private IEnumerable<string> getSectionValues(T objToSerialize)
-        {
-            return from pi in _tType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                let iniValue = pi.GetCustomAttribute(typeof (IniValueAttribute)) as IniValueAttribute
-                where iniValue != null
-                orderby iniValue.Position
-                select string.Format("{0}={1}",
-                    iniValue.Key,
-                    pi.GetValue(objToSerialize));
-        }
-    }
-
 }
