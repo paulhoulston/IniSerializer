@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Text;
 using NUnit.Framework;
 
@@ -8,12 +9,25 @@ namespace IniSerializer
     {
         class When_the_object_is_serialized
         {
-            [Test]
-            public void Then_the_section_name_is_output_on_the_first_line()
+            private readonly string[] _serializedOutput;
+
+            public When_the_object_is_serialized()
             {
                 var objToSerialize = new ObjectToSerialize();
                 var serializer = new IniSerializer();
-                Assert.AreEqual("[Test Section Heading]", serializer.Serialize(objToSerialize).Split('\r', '\n')[0]);
+                _serializedOutput = serializer.Serialize(objToSerialize).Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            [Test]
+            public void Then_the_section_name_is_output_on_the_first_line()
+            {
+                Assert.AreEqual("[Test Section Heading]", _serializedOutput[0]);
+            }
+
+            [Test]
+            public void And_no_other_lines_are_added()
+            {
+                Assert.AreEqual(1, _serializedOutput.Length);
             }
         }
     }
