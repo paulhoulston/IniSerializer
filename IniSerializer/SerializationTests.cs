@@ -196,7 +196,7 @@ namespace IniSerializer
 
     public class Given_I_want_to_serialize_an_enumerable_of_objects
     {
-        [IniSectionAttribute("[Section_1]")]
+        [IniSectionAttribute("[Section]")]
         private class ObjectToSerialize
         {
             [IniValue("Item1", Position = 1)]
@@ -216,12 +216,12 @@ namespace IniSerializer
             public void Then_the_output_is_created_correctly()
             {
                 const string expected =
-                    "[Section_1]\r\n" +
+                    "[Section]\r\n" +
                     "Item1=Value_1_1\r\n" +
                     "Item2=Value_1_2\r\n" +
                     "Item3=Value_1_3";
 
-                var serializedOutput = 
+                var serializedOutput =
                     new IniSerializer<ObjectToSerialize>().Serialize(
                     new[]
                     {
@@ -230,6 +230,42 @@ namespace IniSerializer
                             Item1 = "Value_1_1",
                             Item2 = "Value_1_2",
                             Item3 = "Value_1_3",
+                        }
+                    });
+                Assert.AreEqual(expected, serializedOutput);
+            }
+        }
+
+        public class When_there_are_multiple_items
+        {
+            [Test]
+            public void Then_the_output_is_created_correctly()
+            {
+                const string expected =
+                    "[Section]\r\n" +
+                    "Item1=Value_1_1\r\n" +
+                    "Item2=Value_1_2\r\n" +
+                    "Item3=Value_1_3\r\n" +
+                    "[Section]\r\n" +
+                    "Item1=Value_2_1\r\n" +
+                    "Item2=Value_2_2\r\n" +
+                    "Item3=Value_2_3";
+
+                var serializedOutput =
+                    new IniSerializer<ObjectToSerialize>().Serialize(
+                    new[]
+                    {
+                        new ObjectToSerialize
+                        {
+                            Item1 = "Value_1_1",
+                            Item2 = "Value_1_2",
+                            Item3 = "Value_1_3",
+                        },
+                        new ObjectToSerialize
+                        {
+                            Item1 = "Value_2_1",
+                            Item2 = "Value_2_2",
+                            Item3 = "Value_2_3",
                         }
                     });
                 Assert.AreEqual(expected, serializedOutput);
