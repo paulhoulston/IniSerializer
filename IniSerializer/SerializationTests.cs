@@ -194,14 +194,49 @@ namespace IniSerializer
         }
     }
 
-    //public class Given_I_want_to_serialize_a_list_of_objects
-    //{
-    //    public class When_there_are_multiple_objects
-    //    {
-    //        
-    //    }
-    //}
-    
+    public class Given_I_want_to_serialize_an_enumerable_of_objects
+    {
+        [IniSectionAttribute("[Section_1]")]
+        private class ObjectToSerialize
+        {
+            [IniValue("Item1", Position = 1)]
+            public string Item1 { get; set; }
+
+            [IniValue("Item2", Position = 2)]
+            public string Item2 { get; set; }
+
+            [IniValue("Item3", Position = 3)]
+            public string Item3 { get; set; }
+
+        }
+
+        public class When_there_is_one_item
+        {
+            [Test]
+            public void Then_the_output_is_created_correctly()
+            {
+                const string expected =
+                    "[Section_1]\r\n" +
+                    "Item1=Value_1_1\r\n" +
+                    "Item2=Value_1_2\r\n" +
+                    "Item3=Value_1_3";
+
+                var serializedOutput = 
+                    new IniSerializer<ObjectToSerialize>().Serialize(
+                    new[]
+                    {
+                        new ObjectToSerialize
+                        {
+                            Item1 = "Value_1_1",
+                            Item2 = "Value_1_2",
+                            Item3 = "Value_1_3",
+                        }
+                    });
+                Assert.AreEqual(expected, serializedOutput);
+            }
+        }
+    }
+
     public class MustImplementIniSectionAttributeException : Exception
     {
         public MustImplementIniSectionAttributeException()
@@ -222,6 +257,7 @@ namespace IniSerializer
         }
     }
 
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class IniValueAttribute : Attribute
     {
         public readonly string Key;
@@ -241,6 +277,11 @@ namespace IniSerializer
         public IniSerializer()
         {
             _tType = typeof (T);
+        }
+
+        public string Serialize(IEnumerable<T> objToSerialize)
+        {
+            return string.Join(Environment.NewLine, objToSerialize.Select(Serialize));
         }
 
         public string Serialize(T objToSerialize)
