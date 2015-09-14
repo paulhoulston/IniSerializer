@@ -102,6 +102,8 @@ namespace IniSerializer
 
                 [IniValue("AnIntValue")]
                 public int IntegerValue { get; set; }
+
+                public string PropertyToIgnore { get; set; }
             }
 
             private readonly string[] _serializedOutput;
@@ -113,7 +115,8 @@ namespace IniSerializer
                         .Serialize(new ObjectToSerializeWithOneProperty
                         {
                             StringValue = "Value Of Item 1",
-                            IntegerValue = 3
+                            IntegerValue = 3,
+                            PropertyToIgnore = "StringValueWithNoAttribute"
                         })
                         .Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
             }
@@ -136,6 +139,11 @@ namespace IniSerializer
                 Assert.NotNull(_serializedOutput.SingleOrDefault(str => str.Equals("AStringValue=Value Of Item 1")));
             }
 
+            [Test]
+            public void And_the_property_not_decorated_with_the_IniValueAttribute_is_ignored()
+            {
+                Assert.IsNull(_serializedOutput.SingleOrDefault(str => str.Contains("StringValueWithNoAttribute")));
+            }
         }
     }
     public class MustImplementIniSectionAttributeException : Exception
@@ -154,7 +162,6 @@ namespace IniSerializer
         public IniSectionAttribute(string sectionName)
         {
             SectionName = sectionName;
-
         }
     }
 
