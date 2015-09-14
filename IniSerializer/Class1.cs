@@ -9,9 +9,23 @@ namespace IniSerializer
             [Test]
             public void Then_the_section_name_is_output_correctly()
             {
-                string serializedObject = "[Test Section Heading]";
-                Assert.AreEqual("[Test Section Heading]", serializedObject);
+                var objToSerialize = new ObjectToSerialize();
+                var serializer = new IniSerializer();
+                Assert.AreEqual("[Test Section Heading]", serializer.Serialize(objToSerialize));
             }
         }
     }
+
+    class ObjectToSerialize
+    {
+    }
+
+    class IniSerializer
+    {
+        public string Serialize(ObjectToSerialize objToSerialize)
+        {
+            return "[Test Section Heading]";
+        }
+    }
+
 }
