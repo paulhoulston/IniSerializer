@@ -2,7 +2,7 @@
 
 namespace IniSerializer
 {
-    public class Given_I_want_to_serialize_an_object_with_no_values_to_an_ini_file
+    public class Given_I_want_to_serialize_an_object_with_no_values
     {
         class When_the_object_is_serialized
         {
@@ -16,13 +16,45 @@ namespace IniSerializer
         }
     }
 
+    public class Given_I_want_to_serialize_an_object_with_one_property
+    {
+        class When_the_object_is_serialized
+        {
+            private readonly string[] _serializedOutput;
+
+            public When_the_object_is_serialized()
+            {
+                var objToSerialize = new ObjectToSerializeWithOneProperty { Item1 = "Value Of Item 1" };
+                var serializer = new IniSerializer();
+                _serializedOutput = serializer.Serialize(objToSerialize).Split('\r', '\n');
+            }
+
+            [Test]
+            public void Then_the_section_name_is_output_on_the_first_line()
+            {
+                Assert.AreEqual("[Test Section Heading]", _serializedOutput[0]);
+            }
+
+            [Test]
+            public void And_the_property_is_added_to_the_second_line_as_a_key_value_pair_seperated_by_and_equals_sign()
+            {
+                Assert.AreEqual("Item1=Value Of Item 1", _serializedOutput[1]);
+            }
+        }
+    }
+
     class ObjectToSerialize
     {
     }
 
+    class ObjectToSerializeWithOneProperty
+    {
+        public string Item1 { get; set; }
+    }
+
     class IniSerializer
     {
-        public string Serialize(ObjectToSerialize objToSerialize)
+        public string Serialize<T>(T objToSerialize)
         {
             return "[Test Section Heading]";
         }
