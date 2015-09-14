@@ -240,11 +240,11 @@ namespace IniSerializer
             public void Then_the_output_is_created_correctly()
             {
                 const string expected =
-                    "[Section]\r\n" +
+                    "[Section_1]\r\n" +
                     "Item1=Value_1_1\r\n" +
                     "Item2=Value_1_2\r\n" +
                     "Item3=Value_1_3\r\n" +
-                    "[Section]\r\n" +
+                    "[Section_2]\r\n" +
                     "Item1=Value_2_1\r\n" +
                     "Item2=Value_2_2\r\n" +
                     "Item3=Value_2_3";
